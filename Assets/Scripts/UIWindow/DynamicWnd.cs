@@ -1,0 +1,72 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+/// <summary>
+/// 动态UI元素界面
+/// </summary>
+public class DynamicWnd : WindowRoot {
+    public Animation tipsAnim;
+    public Text txtTips;
+
+    private Queue<string> tipsQueue = new Queue<string>();
+    private bool isTipsPlay = false;
+
+    protected override void InitWnd()
+    {
+        base.InitWnd();
+        SetActive(txtTips, false);
+    }
+
+    private void Update()
+    {
+        DeTips();
+    }
+
+    public void AddTips(string tips)
+    {
+        lock (tipsQueue)
+        {
+            tipsQueue.Enqueue(tips);
+        }
+    }
+
+    public void DeTips()
+    {
+        if (tipsQueue.Count>0&&!isTipsPlay)
+        {
+            isTipsPlay = true;
+            lock (tipsQueue)
+            {
+                string tips = tipsQueue.Dequeue();
+                SetTips(tips);
+            }
+        }
+    }
+
+    public void SetTips(string tips)
+    {
+        SetActive(txtTips, true);
+        SetText(txtTips, tips);
+
+        AnimationClip clip = tipsAnim.clip;
+        tipsAnim.Play();
+        //播放完动画之后再将txt设置为false
+        StartCoroutine(AfterAnimPlay(clip.length, () =>
+        {
+            SetActive(txtTips, false);
+            isTipsPlay = false;
+        }));
+    }
+
+    private IEnumerator AfterAnimPlay(float sec,Action cb)
+    {
+        yield return new WaitForSeconds(sec);
+        if (cb !=null)
+        {
+            cb();
+        }
+    }
+
+}
