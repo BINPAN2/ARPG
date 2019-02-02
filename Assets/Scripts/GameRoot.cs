@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using PEProtocol;
 
 /// <summary>
 /// 游戏入口
@@ -37,6 +38,7 @@ public class GameRoot : MonoBehaviour {
     private void Init()
     {
         //服务模块初始化
+        NetSvc.Instance.InitSvc();
         ResSvc.Instance.InitSvc();
         AudioSvc.Instance.InitSvc();
         //业务系统初始化
@@ -60,6 +62,20 @@ public class GameRoot : MonoBehaviour {
     public  void  AddTips(string tips)
     {
         dynamicWnd.AddTips(tips);
+    }
+
+    private PlayerData playerData = null;
+    public PlayerData PlayerData
+    {
+        get
+        {
+            return playerData;
+        }
+    }
+
+    public void SetPlayerData(PlayerData pd)
+    {
+        playerData = pd;
     }
 
 }

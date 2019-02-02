@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using PEProtocol;
 
 /// <summary>
 /// 登录页面
@@ -34,7 +35,18 @@ public class LoginWnd : WindowRoot {
         {
             PlayerPrefs.SetString("Account", iptAccount.text);
             PlayerPrefs.SetString("Password", iptPassword.text);
-            LoginSys.Instance.RsLogin();
+            //发送网络消息，请求登录
+            GameMsg msg = new GameMsg
+            {
+                cmd = (int)CMD.ReqLogin,
+                reqLogin = new ReqLogin
+                {
+                    acct = iptAccount.text,
+                    pass = iptPassword.text
+                }
+            };
+            NetSvc.Instance.SendMsg(msg);
+
         }
         else
         {

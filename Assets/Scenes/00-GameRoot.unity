@@ -666,6 +666,7 @@ GameObject:
   m_Component:
   - component: {fileID: 842324184}
   - component: {fileID: 842324187}
+  - component: {fileID: 842324189}
   - component: {fileID: 842324186}
   - component: {fileID: 842324185}
   - component: {fileID: 842324188}
@@ -743,6 +744,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BGAudio: {fileID: 1736942488}
   UIAudio: {fileID: 1209804776}
+--- !u!114 &842324189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 842324183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ebabf8e13192574d8ec0a5b0a89df23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &991269223
 GameObject:
   m_ObjectHideFlags: 0
