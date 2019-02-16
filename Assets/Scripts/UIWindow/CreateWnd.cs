@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using PEProtocol;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,7 +28,16 @@ public class CreateWnd : WindowRoot {
         if (iptRdName.text != "")
         {
             //TODO 发送角色名称至服务器
+            GameMsg msg = new GameMsg
+            {
+                cmd = (int)CMD.ReqRename,
+                reqRename = new ReqRename
+                {
+                    name = iptRdName.text
+                }
+            };
 
+            NetSvc.Instance.SendMsg(msg);
         }
         else
         {

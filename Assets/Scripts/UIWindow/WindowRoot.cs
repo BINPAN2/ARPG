@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 /// <summary>
 /// UI界面基类
@@ -74,4 +76,35 @@ public class WindowRoot : MonoBehaviour {
     }
     #endregion
 
+
+    #region UIEvt
+
+    protected T GetOrAddComponet<T>(GameObject go)where T:Component
+    {
+        T t = go.GetComponent<T>();
+        if (t==null)
+        {
+            t = go.AddComponent<T>();
+        }
+        return t;
+    }
+
+    protected void OnClickDown(GameObject go, Action<PointerEventData> cb)
+    {
+        PEListener listener = GetOrAddComponet<PEListener>(go);
+        listener.onClickDown = cb;
+    }
+
+    protected void OnClickUp(GameObject go, Action<PointerEventData> cb)
+    {
+        PEListener listener = GetOrAddComponet<PEListener>(go);
+        listener.onClickUp = cb;
+    }
+
+    protected void OnDrag(GameObject go, Action<PointerEventData> cb)
+    {
+        PEListener listener = GetOrAddComponet<PEListener>(go);
+        listener.onDrag = cb;
+    }
+    #endregion
 }

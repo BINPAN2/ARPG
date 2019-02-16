@@ -44,6 +44,8 @@ public class GameRoot : MonoBehaviour {
         //业务系统初始化
         LoginSys login = GetComponent<LoginSys>();
         login.InitSys();
+        MainCitySys maincity = GetComponent<MainCitySys>();
+        maincity.InitSys();
         //进入登陆场景并加载相应UI
         login.Enterlogin();
     }
@@ -76,6 +78,11 @@ public class GameRoot : MonoBehaviour {
     public void SetPlayerData(PlayerData pd)
     {
         playerData = pd;
+    }
+
+    public void SetPlayerName(string name)
+    {
+        playerData.name = name;
     }
 
 }

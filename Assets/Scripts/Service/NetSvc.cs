@@ -99,13 +99,20 @@ public class NetSvc : MonoBehaviour {
                 case ErrorCode.WrongPass:
                     GameRoot.Instance.AddTips("密码错误");
                     break;
+                case ErrorCode.UpdateDBError:
+                    PECommon.Log("数据库更新异常");
+                    GameRoot.Instance.AddTips("网络不稳定");//假装告诉用户网络不稳定
+                    break;
             }
         }
 
         switch ((CMD)msg.cmd)
         {
             case CMD.RspLogin:
-                LoginSys.Instance.RsLogin(msg);
+                LoginSys.Instance.RspLogin(msg);
+                break;
+            case CMD.RspRename:
+                LoginSys.Instance.RspRename(msg);
                 break;
         }
 

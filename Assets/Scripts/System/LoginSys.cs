@@ -50,7 +50,7 @@ public class LoginSys : MonoBehaviour
 
     }
 
-    public void RsLogin(GameMsg msg)
+    public void RspLogin(GameMsg msg)
     {
         GameRoot.Instance.AddTips("登陆成功");
         GameRoot.Instance.SetPlayerData(msg.rspLogin.playerData);
@@ -63,9 +63,21 @@ public class LoginSys : MonoBehaviour
         else
         {
             //进入主城 TODO
+            MainCitySys.Instance.EnterMainCity();
         }
         //关闭登陆页面
         loginWnd.SetWndState(false);
+    }
+
+    public void RspRename(GameMsg msg)
+    {
+        GameRoot.Instance.SetPlayerName(msg.rspRename.name);
+        //TODO
+        //跳转场景 进入主城
+        MainCitySys.Instance.EnterMainCity();
+
+        //关闭创建界面
+        createWnd.SetWndState(false);
     }
 
 
