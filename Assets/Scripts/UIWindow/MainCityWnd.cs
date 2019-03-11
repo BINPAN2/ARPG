@@ -25,12 +25,16 @@ public class MainCityWnd : WindowRoot {
 
     public Image imgPowerPrg;
     public Transform expPrgTrans;
+
+    public Button btnAutoGuide;
+    public Button btnChat;
     #endregion
 
     private bool menuState= true;
     private float pointDis;
     private Vector2 startPos = Vector2.zero;
     private Vector2 defaultPos = Vector2.zero;
+    private AutoGuideCfg curTaskData;
 
     #region MainFunctions
     protected override void InitWnd()
@@ -80,6 +84,42 @@ public class MainCityWnd : WindowRoot {
                 img.fillAmount = 0;
             }
         }
+
+
+        //设置自动任务图标
+        curTaskData = ResSvc.Instance.GetAutoGuideCfg(pd.guideID);
+        if (curTaskData != null)
+        {
+            SetGuideBtnIcon(curTaskData.npcID);
+        }
+        else
+        {
+            SetGuideBtnIcon(-1);
+        }
+    }
+
+
+    private void SetGuideBtnIcon(int npcID)
+    {
+        string path = "";
+        Image img = btnAutoGuide.GetComponent<Image>();
+        switch (npcID)
+        {
+            case Constants.NPCWiseMan:
+                path = PathDefine.WiseManHead;
+                break;
+            case Constants.NPCGeneral:
+                path = PathDefine.GeneralHead;
+                break;
+            case Constants.NPCArtisan:
+                path = PathDefine.ArtisanHead;
+                break;
+            case Constants.NPcTrader:
+                path = PathDefine.TraderHead;
+                break;
+        }
+
+        SetSprite(img, path);
     }
     #endregion
 
@@ -102,6 +142,37 @@ public class MainCityWnd : WindowRoot {
         anim.Play(clip.name);
     }
 
+    public void OnHeadBtnClick()
+    {
+        AudioSvc.Instance.PlayUIAudio(Constants.UIOpenPage);
+        MainCitySys.Instance.OpenInfoWnd();
+    }
+
+    public void OnAutoGuideBtnClick()
+    {
+        AudioSvc.Instance.PlayUIAudio(Constants.UIClickBtn);
+        if (curTaskData!=null)
+        {
+            MainCitySys.Instance.RunTask(curTaskData);
+        }
+
+        else
+        {
+            GameRoot.Instance.AddTips("更多引导任务正在开发中.....");
+        }
+    }
+
+    public void OnStrongBtnClick()
+    {
+        AudioSvc.Instance.PlayUIAudio(Constants.UIOpenPage);
+        MainCitySys.Instance.OpenStrongWnd();
+    }
+
+    public void OnChatBtnClick()
+    {
+        AudioSvc.Instance.PlayUIAudio(Constants.UIOpenPage);
+        MainCitySys.Instance.OpenChatWnd();
+    }
 
     public void RegisterTouchEvts()
     {
@@ -117,7 +188,7 @@ public class MainCityWnd : WindowRoot {
             imgDirBg.transform.position = defaultPos;
             SetActive(imgDirPoint, false);
             imgDirPoint.transform.localPosition = Vector2.zero;
-            //TODO方向信息传递
+            //方向信息传递
             MainCitySys.Instance.SetMoveDir(Vector2.zero);
             Debug.Log(Vector2.zero);
         });

@@ -74,19 +74,35 @@ public class WindowRoot : MonoBehaviour {
     {
         SetText(trans.GetComponent<Text>(), num.ToString());
     }
+
+
+    protected T GetOrAddComponet<T>(GameObject go) where T : Component
+    {
+        T t = go.GetComponent<T>();
+        if (t == null)
+        {
+            t = go.AddComponent<T>();
+        }
+        return t;
+    }
+
+    protected void SetSprite(Image img,string path)
+    {
+        Sprite sp = ResSvc.Instance.LoadSprite(path);
+        img.sprite = sp;
+    }
+
+
     #endregion
 
 
     #region UIEvt
 
-    protected T GetOrAddComponet<T>(GameObject go)where T:Component
+    protected void OnClick(GameObject go, Action<object> cb,object obj)
     {
-        T t = go.GetComponent<T>();
-        if (t==null)
-        {
-            t = go.AddComponent<T>();
-        }
-        return t;
+        PEListener listener = GetOrAddComponet<PEListener>(go);
+        listener.onClick = cb;
+        listener.args = obj;
     }
 
     protected void OnClickDown(GameObject go, Action<PointerEventData> cb)

@@ -6,11 +6,13 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// UI事件监听插件
 /// </summary>
-public class PEListener : MonoBehaviour,IPointerDownHandler,IPointerUpHandler,IDragHandler {
+public class PEListener : MonoBehaviour,IPointerClickHandler,IPointerDownHandler,IPointerUpHandler,IDragHandler {
+    public Action<object> onClick;
     public Action<PointerEventData> onClickDown;
     public Action<PointerEventData> onClickUp;
     public Action<PointerEventData> onDrag;
 
+    public object args;
 
     public void OnDrag(PointerEventData eventData)
     {
@@ -33,6 +35,14 @@ public class PEListener : MonoBehaviour,IPointerDownHandler,IPointerUpHandler,ID
         if (onClickUp!=null)
         {
             onClickUp(eventData);
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (onClick != null)
+        {
+            onClick(args);
         }
     }
 

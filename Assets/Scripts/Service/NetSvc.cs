@@ -103,6 +103,19 @@ public class NetSvc : MonoBehaviour {
                     PECommon.Log("数据库更新异常");
                     GameRoot.Instance.AddTips("网络不稳定");//假装告诉用户网络不稳定
                     break;
+                case ErrorCode.ServerDataError:
+                    PECommon.Log("客户端与服务器数据不一致");
+                    GameRoot.Instance.AddTips("网络不稳定");//假装告诉用户网络不稳定
+                    break;
+                case ErrorCode.LackCoin:
+                    GameRoot.Instance.AddTips("金币数量不够");
+                    break;
+                case ErrorCode.LackCrystal:
+                    GameRoot.Instance.AddTips("水晶数量不够");
+                    break;
+                case ErrorCode.LackLevel:
+                    GameRoot.Instance.AddTips("角色等级不够");
+                    break;
             }
         }
 
@@ -113,6 +126,15 @@ public class NetSvc : MonoBehaviour {
                 break;
             case CMD.RspRename:
                 LoginSys.Instance.RspRename(msg);
+                break;
+            case CMD.RspGuide:
+                MainCitySys.Instance.RspGuide(msg);
+                break;
+            case CMD.RspStrong:
+                MainCitySys.Instance.RspStrong(msg);
+                break;
+            case CMD.PshChat:
+                MainCitySys.Instance.PshChat(msg);
                 break;
         }
 
