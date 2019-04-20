@@ -25,8 +25,20 @@ public class PathDefine
     public const string MapCfg = "ResCfgs/map";
     public const string AutoGuideCfg = "ResCfgs/guide";
     public const string StrongCfg = "ResCfgs/strong";
+    public const string TaskRewardCfg = "ResCfgs/taskreward";
+    public const string SkillCfg = "ResCfgs/skill";
+    public const string SkillMoveCfg = "ResCfgs/skillmove";
+    public const string SkillActionCfg = "ResCfgs/skillaction";
+    public const string MonsterCfg = "ResCfgs/monster";
+
     //player
     public const string AssassinCity = "PrefabPlayer/AssassinCity";
+    public const string AssassinBattle = "PrefabPlayer/AssassinBattle";
+
+    public const string ItemEntityHp = "PrefabUI/ItemEntityHp";
+
+    //TaskReward
+    public const string TaskItemPrefab = "PrefabUI/Itemtask";
 
     //AutoGuideIcon
     public const string TaskHead = "ResImages/task";
@@ -45,4 +57,5 @@ public class PathDefine
     //Chat
     public const string ChatIconClick = "ResImages/btntype1";
     public const string ChatIconIdle = "ResImages/btntype2";
+
 }

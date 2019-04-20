@@ -116,6 +116,12 @@ public class NetSvc : MonoBehaviour {
                 case ErrorCode.LackLevel:
                     GameRoot.Instance.AddTips("角色等级不够");
                     break;
+                case ErrorCode.LackDiamond:
+                    GameRoot.Instance.AddTips("钻石数量不够");
+                    break;
+                case ErrorCode.LackPower:
+                    GameRoot.Instance.AddTips("体力不足");
+                    break;
             }
         }
 
@@ -135,6 +141,21 @@ public class NetSvc : MonoBehaviour {
                 break;
             case CMD.PshChat:
                 MainCitySys.Instance.PshChat(msg);
+                break;
+            case CMD.RspBuy:
+                MainCitySys.Instance.RspBuy(msg);
+                break;
+            case CMD.PshPower:
+                MainCitySys.Instance.PshPower(msg);
+                break;
+            case CMD.RspTakeTaskReward:
+                MainCitySys.Instance.RspTakeTaskReward(msg);
+                break;
+            case CMD.PshTaskPrgs:
+                MainCitySys.Instance.PshTaskPrgs(msg);
+                break;
+            case CMD.RspFBFight:
+                MissionSys.Instance.RspFBFight(msg);
                 break;
         }
 

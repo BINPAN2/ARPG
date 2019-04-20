@@ -6,12 +6,19 @@ using UnityEngine;
 /// </summary>
 
 
-    public enum TxtColor
+public enum TxtColor
 {
     Red,
     Blue,
     Yellow,
     Green
+}
+
+public enum DamageType
+{
+    None,
+    Ad=1,
+    Ap=2,
 }
 
 public class Constants {
@@ -51,6 +58,7 @@ public class Constants {
     //音效名称
     public const string BGLogin = "bgLogin";
     public const string BGMainCity = "bgMainCity";
+    public const string BGHuangYe = "bgHuangYe";
 
     //登录按钮音效
     public const string UILoginBtn = "uiLoginBtn";
@@ -69,19 +77,30 @@ public class Constants {
     public const int ScreenOPDis = 90;
 
     //角色移动速度
-    public const float PlayerMoveSpeed = 8;
-    public const float MonsterMoveSpeed = 4;
+    public const float PlayerMoveSpeed = 5;
+    public const float MonsterMoveSpeed = 2.5f;
 
     //运动平滑
     public const float AccelerSpeed = 5;
+    //血条渐变速度
+    public const float AccelerHpSpeed = 0.3f; 
+
+    //player action 默认
+    public const int DefaultAction = -1;
+    public const int ActionBorn = 0;
+    public const int ActionDie = 100;
+    public const int ActionHit = 101;
+
+    public const int DieAniLength = 5000;
 
     //混合参数
     public const float BlendIdle = 0;
-    public const float BlendWalk = 1;
+    public const float BlendMove = 1;
 
     //AutoGuide
     public const int NPCWiseMan = 0;
     public const int NPCGeneral = 1;
     public const int NPCArtisan = 2;
-    public const int NPcTrader = 3;
+    public const int NPCTrader = 3;
+    public const int NPCNone = -1;
 }

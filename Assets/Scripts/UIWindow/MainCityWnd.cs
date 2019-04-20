@@ -114,8 +114,11 @@ public class MainCityWnd : WindowRoot {
             case Constants.NPCArtisan:
                 path = PathDefine.ArtisanHead;
                 break;
-            case Constants.NPcTrader:
+            case Constants.NPCTrader:
                 path = PathDefine.TraderHead;
+                break;
+            case Constants.NPCNone:
+                path = PathDefine.TaskHead;
                 break;
         }
 
@@ -124,6 +127,12 @@ public class MainCityWnd : WindowRoot {
     #endregion
 
     #region UIEvent
+    public void OnTaskRewardBtnClick()
+    {
+        AudioSvc.Instance.PlayUIAudio(Constants.UIOpenPage);
+        MainCitySys.Instance.OpenTaskRewardWnd();
+    }
+
     public void OnMenuBtnClick()
     {
         AudioSvc.Instance.PlayUIAudio(Constants.UIExtenBtn);
@@ -174,6 +183,23 @@ public class MainCityWnd : WindowRoot {
         MainCitySys.Instance.OpenChatWnd();
     }
 
+    public void OnMKCoinBtnClick()
+    {
+        AudioSvc.Instance.PlayUIAudio(Constants.UIClickBtn);
+        MainCitySys.Instance.OpenBuyWnd(1);
+    }
+
+    public void OnBuyPowerBtnClick()
+    {
+        AudioSvc.Instance.PlayUIAudio(Constants.UIClickBtn);
+        MainCitySys.Instance.OpenBuyWnd(0);
+    }
+
+    public void OnMissionBtnClick()
+    {
+        MainCitySys.Instance.EnterMission();
+    }
+
     public void RegisterTouchEvts()
     {
         OnClickDown(imgTouch.gameObject, (PointerEventData evt) =>
@@ -190,7 +216,7 @@ public class MainCityWnd : WindowRoot {
             imgDirPoint.transform.localPosition = Vector2.zero;
             //方向信息传递
             MainCitySys.Instance.SetMoveDir(Vector2.zero);
-            Debug.Log(Vector2.zero);
+            //Debug.Log(Vector2.zero);
         });
 
         OnDrag(imgTouch.gameObject, (PointerEventData evt) =>
@@ -208,10 +234,12 @@ public class MainCityWnd : WindowRoot {
             }
             //TODO方向信息传递
             MainCitySys.Instance.SetMoveDir(dir);
-            Debug.Log(dir.normalized);
+            //Debug.Log(dir.normalized);
 
         });
 
     }
+
+
     #endregion
 }

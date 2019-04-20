@@ -41,11 +41,18 @@ public class GameRoot : MonoBehaviour {
         NetSvc.Instance.InitSvc();
         ResSvc.Instance.InitSvc();
         AudioSvc.Instance.InitSvc();
+        TimeSvc.Instance.InitSvc();
         //业务系统初始化
         LoginSys login = GetComponent<LoginSys>();
         login.InitSys();
         MainCitySys maincity = GetComponent<MainCitySys>();
         maincity.InitSys();
+        MissionSys mission = GetComponent<MissionSys>();
+        mission.InitSys();
+        BattleSys battle = GetComponent<BattleSys>();
+        battle.InitSys();
+
+        dynamicWnd.SetWndState(true);
         //进入登陆场景并加载相应UI
         login.Enterlogin();
     }
@@ -58,7 +65,6 @@ public class GameRoot : MonoBehaviour {
             canvas.GetChild(i).gameObject.SetActive(false);
         }
 
-        dynamicWnd.SetWndState(true);
     }
 
     public  void  AddTips(string tips)
@@ -103,5 +109,36 @@ public class GameRoot : MonoBehaviour {
         playerData.apdef = data.apdef;
         playerData.hp = data.hp;
         playerData.strongArr = data.strongArr;
+    }
+
+    public void SetPlayerDataByBuy(RspBuy data)
+    {
+        playerData.coin = data.coin;
+        playerData.diamond = data.diamond;
+        playerData.power = data.power;
+    }
+
+    public void SetPlayerDataByPower(PshPower data)
+    {
+        playerData.power = data.power;
+    }
+
+    public void SetPlayerDataByTakeTaskReward(RspTakeTaskReward data)
+    {
+        PlayerData.coin = data.coin;
+        PlayerData.exp = data.exp;
+        PlayerData.lv = data.lv;
+        PlayerData.taskArr = data.taskArr;
+    }
+
+    public void SetPlayerDataByPshTaskPrgs(PshTaskPrgs data)
+    {
+        PlayerData.taskArr = data.taskArr;
+    }
+
+
+    public void SetPlayerDataByFBFightStart(RspFBFight data)
+    {
+        PlayerData.power = data.power;
     }
 }

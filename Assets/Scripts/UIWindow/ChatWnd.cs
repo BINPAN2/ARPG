@@ -88,8 +88,16 @@ public class ChatWnd : WindowRoot {
         RefreshUI();
     }
 
+
+    private bool canSend = true;
     public void OnSendBtnClick()
     {
+        if (!canSend)
+        {
+            GameRoot.Instance.AddTips("聊天信息每5秒发送一次");
+            return;
+        }
+
         if (iptChat.text !=""&& iptChat.text != " "&& iptChat.text !=null)
         {
             if (iptChat.text.Length>20)
@@ -109,6 +117,13 @@ public class ChatWnd : WindowRoot {
                 };
                 iptChat.text = "";
                 NetSvc.Instance.SendMsg(msg);
+
+                canSend = false;
+
+                TimeSvc.Instance.AddTimeTask((int tid) =>
+                {
+                    canSend = true;
+                },5,PETimeUnit.Second);
             }
         }
         else

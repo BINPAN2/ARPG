@@ -29,6 +29,8 @@ public class MainCitySys :MonoBehaviour {
     public GuideWnd guideWNd;
     public StrongWnd strongWnd;
     public ChatWnd chatWnd;
+    public BuyWnd buyWnd;
+    public TaskRewardWnd taskRewardWnd;
     private PlayerController playerCtrl;
     private Transform CharacCamTrans;
     private AutoGuideCfg curTaskData;
@@ -91,7 +93,7 @@ public class MainCitySys :MonoBehaviour {
         if (_dir != Vector2.zero)
         {
             playerCtrl.Dir = _dir;
-            playerCtrl.SetBlend(Constants.BlendWalk);
+            playerCtrl.SetBlend(Constants.BlendMove);
         }
         else
         {
@@ -113,6 +115,11 @@ public class MainCitySys :MonoBehaviour {
         CharacCamTrans.localEulerAngles = new Vector3(0, 180 + playerCtrl.transform.localEulerAngles.y, 0);
         CharacCamTrans.gameObject.SetActive(true);
         infoWnd.SetWndState(true);
+    }
+    public void OpenTaskRewardWnd()
+    {
+        StopNavTask();
+        taskRewardWnd.SetWndState(true);
     }
 
     public void CloseInfoWnd()
@@ -167,7 +174,7 @@ public class MainCitySys :MonoBehaviour {
                 nav.enabled = true;
                 nav.speed = Constants.PlayerMoveSpeed;
                 nav.SetDestination(NPCPosTrans[cfg.npcID].position);
-                playerCtrl.SetBlend(Constants.BlendWalk);
+                playerCtrl.SetBlend(Constants.BlendMove);
             }
         }
         else
@@ -219,11 +226,13 @@ public class MainCitySys :MonoBehaviour {
 
     public void OpenStrongWnd()
     {
+        StopNavTask();
         strongWnd.SetWndState(true);
     }
 
     public void OpenChatWnd()
     {
+        StopNavTask();
         chatWnd.SetWndState(true);
     }
 
@@ -231,6 +240,14 @@ public class MainCitySys :MonoBehaviour {
     {
         chatWnd.AddChatMsg(msg.pshChat.name, msg.pshChat.Chat);
     }
+
+    public void OpenBuyWnd(int type)
+    {
+        StopNavTask();
+        buyWnd.SetBuyType(type);
+        buyWnd.SetWndState(true);
+    }
+
 
     public AutoGuideCfg GetCurTaskData()
     {
@@ -264,18 +281,23 @@ public class MainCitySys :MonoBehaviour {
                 break;
             case 1:
                 //进入副本
+                EnterMission();
                 break;
             case 2:
                 //进入强化界面
+                OpenStrongWnd();
                 break;
             case 3:
                 //进入体力购买
+                OpenBuyWnd(0);
                 break;
             case 4:
                 //进入金币铸造
+                OpenBuyWnd(1);
                 break;
             case 5:
                 //进入世界聊天
+                OpenChatWnd();
                 break;
         }
         GameRoot.Instance.SetPlayerDataByGuide(data);
@@ -290,5 +312,43 @@ public class MainCitySys :MonoBehaviour {
         GameRoot.Instance.AddTips(Constants.Color("战力增加" + (fightNow- fightPre), TxtColor.Blue));
         strongWnd.RefreshUI();
     }
+
+    public void RspBuy (GameMsg msg)
+    {
+        RspBuy data = msg.rspBuy;
+        GameRoot.Instance.SetPlayerDataByBuy(data);
+        GameRoot.Instance.AddTips("购买成功");
+        buyWnd.SetWndState(false);
+        mainCityWnd.RefreshUI();
+    }
+    public void PshPower(GameMsg msg)
+    {
+        PshPower data = msg.pshPower;
+        GameRoot.Instance.SetPlayerDataByPower(data);
+        mainCityWnd.RefreshUI();
+    }
+
+    public void RspTakeTaskReward(GameMsg msg)
+    {
+        RspTakeTaskReward data = msg.rspTakeTaskReward;
+        GameRoot.Instance.SetPlayerDataByTakeTaskReward(data);
+        taskRewardWnd.RefreshUI();
+        mainCityWnd.RefreshUI();
+    }
+
+    public void PshTaskPrgs(GameMsg msg)
+    {
+        PshTaskPrgs data = msg.pshTaskPrgs;
+        GameRoot.Instance.SetPlayerDataByPshTaskPrgs(data);
+    }
+
+    #region Mission
+    public void EnterMission()
+    {
+        StopNavTask();
+        MissionSys.Instance.EnterMission();
+    }
+
+    #endregion
 
 }
