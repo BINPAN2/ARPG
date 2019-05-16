@@ -7,7 +7,7 @@ public abstract class Controller : MonoBehaviour {
     public Animator anim;
     public Transform hpRoot;
     protected Dictionary<string, GameObject> fxDic = new Dictionary<string, GameObject>();
-
+    protected Transform CamTrans;
     protected bool isMove = false;
     private Vector2 dir = Vector2.zero;
     public Vector2 Dir
@@ -55,5 +55,19 @@ public abstract class Controller : MonoBehaviour {
     {
         this.isSkillMove = isSkillMove;
         this.skillMoveSpeed = skillMoveSpeed;
+    }
+
+    public virtual void SetAtkDirCam(Vector2 dir)
+    {
+        float angle = Vector2.SignedAngle(dir, new Vector2(0, 1)) + CamTrans.eulerAngles.y;
+        Vector3 eulerAngles = new Vector3(0, angle, 0);
+        transform.localEulerAngles = eulerAngles;
+    }
+
+    public virtual void SetAtkDirLocal(Vector2 dir)
+    {
+        float angle = Vector2.SignedAngle(dir, new Vector2(0, 1));
+        Vector3 eulerAngles = new Vector3(0, angle, 0);
+        transform.localEulerAngles = eulerAngles;
     }
 }

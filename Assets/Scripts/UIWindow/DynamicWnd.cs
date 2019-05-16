@@ -11,9 +11,12 @@ public class DynamicWnd : WindowRoot {
     public Text txtTips;
     public Transform transHpItemRoot;
 
+    public Animation playerDodgeAni;
+
     private Queue<string> tipsQueue = new Queue<string>();
     private Dictionary<string, ItemEntityHp> itemHpDic = new Dictionary<string, ItemEntityHp>();
     private bool isTipsPlay = false;
+
 
     protected override void InitWnd()
     {
@@ -102,6 +105,16 @@ public class DynamicWnd : WindowRoot {
         }
     }
 
+    public void DelAllHpItemInfo()
+    {
+        foreach (var item in itemHpDic)
+        {
+            Destroy(item.Value.gameObject);
+        }
+
+        itemHpDic.Clear();
+    }
+
     public void SetDodge(string mname)
     {
         ItemEntityHp item = null;
@@ -136,5 +149,11 @@ public class DynamicWnd : WindowRoot {
         {
             item.SetHpVal(oldVal,newVal);
         }
+    }
+
+    public void SetPlayerDodge()
+    {
+        playerDodgeAni.Stop();
+        playerDodgeAni.Play();
     }
 }

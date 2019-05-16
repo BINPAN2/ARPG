@@ -28,10 +28,12 @@ public class SkillMgr : MonoBehaviour
             int index = i;//第几个Action
             if (sumTime > 0)
             {
-                TimeSvc.Instance.AddTimeTask((int tid) =>
+                int actid = TimeSvc.Instance.AddTimeTask((int tid) =>
                 {
                     SkillAction(from, skillcfg,index);
+                    from.RemoveActionCB(tid);
                 }, sumTime);
+                from.skillActionCBLst.Add(actid);
             }
             else
             {
@@ -46,17 +48,37 @@ public class SkillMgr : MonoBehaviour
         int damage = skillcfg.skillDamageLst[index];
         SkillActionCfg skillActionCfg = ResSvc.Instance.GetSkillActionCfg(skillcfg.skillActionLst[index]);
 
-        for (int i = 0; i < monsterLst.Count; i++)
+        if (from.entityType == EntityType.Player)
         {
-            MonsterEntity em = monsterLst[i];
-            //判断距离和角度
-            if (IsInRange(from.GetPos(), em.GetPos(), skillActionCfg.radius)
-                && IsInAngle(from.GetTrans(), em.GetPos(), skillActionCfg.angle))
+            for (int i = 0; i < monsterLst.Count; i++)
             {
-                //计算伤害
-                CalcDamage(from, em, skillcfg, damage);
+                MonsterEntity em = monsterLst[i];
+                //判断距离和角度
+                if (IsInRange(from.GetPos(), em.GetPos(), skillActionCfg.radius)
+                    && IsInAngle(from.GetTrans(), em.GetPos(), skillActionCfg.angle))
+                {
+                    //计算伤害
+                    CalcDamage(from, em, skillcfg, damage);
+                }
             }
         }
+
+        else if (from.entityType == EntityType.Monster)
+        {
+            PlayerEntity playerEntity = from.battleMgr.playerEntity;
+            if (playerEntity!=null)
+            {          
+                //判断距离和角度
+                if (IsInRange(from.GetPos(), playerEntity.GetPos(), skillActionCfg.radius)
+                    && IsInAngle(from.GetTrans(), playerEntity.GetPos(), skillActionCfg.angle))
+                {
+                    //计算伤害
+                    CalcDamage(from, playerEntity, skillcfg, damage);
+                }
+            }
+        }
+
+
     }
 
     private System.Random rd = new System.Random();
@@ -120,12 +142,24 @@ public class SkillMgr : MonoBehaviour
         {
             target.Hp = 0;
             target.Die();
-            target.battleMgr.RemoveMonster(target.Name);
+            if (target.entityType == EntityType.Monster)
+            {
+                target.battleMgr.RemoveMonster(target.Name);
+            }
+
+            else if (target.entityType == EntityType.Player)
+            {
+                target.battleMgr.EndBattle(false, 0);
+                target.battleMgr.playerEntity = null;
+            }
         }
         else
         {
             target.Hp -= sumDamage;
-            target.Hit();
+            if (target.entityState == EntityState.None && target.GetBreakState())
+            {
+                target.Hit();
+            }
         }
 
 
@@ -166,16 +200,43 @@ public class SkillMgr : MonoBehaviour
     /// </summary>
     public void AttackEffect(EntityBase entity, int skillID)
     {
-        entity.canMove = false;
-        entity.SetDir(Vector2.zero);
+
         SkillCfg skillcfg = ResSvc.Instance.GetSkillCfg(skillID);
+        if (entity.entityType == EntityType.Player)
+        {
+            if (entity.GetDirInput() == Vector2.zero)
+            {
+                //TODO
+            }
+            else
+            {
+                entity.SetAtkDir(entity.GetDirInput(), true);
+            }
+        }
+
+        //是否忽略释放技能时的碰撞
+        if (!skillcfg.isCollide)
+        {
+            Physics.IgnoreLayerCollision(9, 10);
+            TimeSvc.Instance.AddTimeTask((int tid) =>
+            {
+                Physics.IgnoreLayerCollision(9, 10, false);
+            }, skillcfg.skillTime);
+        }
+
+        //技能是否是霸体技能
+        if (!skillcfg.isBreak)
+        {
+            entity.entityState = EntityState.BatiState;
+        }
 
         entity.SetAction(skillcfg.aniAction);
         entity.SetFX(skillcfg.fx, skillcfg.skillTime);
 
         CalcSkillMove(entity, skillcfg);
-
-        TimeSvc.Instance.AddTimeTask((int tid) =>
+        entity.canMove = false;
+        entity.SetDir(Vector2.zero);
+        entity.skillEndCB =  TimeSvc.Instance.AddTimeTask((int tid) =>
         {
             entity.Idle();
         }, skillcfg.skillTime);
@@ -193,20 +254,24 @@ public class SkillMgr : MonoBehaviour
             if (skillMoveCfg.delayTime > 0)
             {
                 sumTime += skillMoveCfg.delayTime;
-                TimeSvc.Instance.AddTimeTask((int tid) =>
+                int moveid = TimeSvc.Instance.AddTimeTask((int tid) =>
                 {
                     entity.SetSkillMoveState(true, speed);
+                    entity.RemoveMoveCB(tid);
                 }, sumTime);
+                entity.skillMoveCBLst.Add(moveid);
             }
             else
             {
                 entity.SetSkillMoveState(true, speed);
             }
             sumTime += skillMoveCfg.moveTime;
-            TimeSvc.Instance.AddTimeTask((int tid) =>
+            int stopid = TimeSvc.Instance.AddTimeTask((int tid) =>
             {
                 entity.SetSkillMoveState(false);
+                entity.RemoveMoveCB(tid);
             }, sumTime);
+            entity.skillMoveCBLst.Add(stopid);
         }
     }
 }

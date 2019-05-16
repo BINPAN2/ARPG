@@ -1,4 +1,5 @@
 ﻿using PEProtocol;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,12 +11,15 @@ public class BattleMgr : MonoBehaviour
     private StateMgr stateMgr;
     private SkillMgr skillMgr;
     private MapMgr mapMgr;
+    private GameObject player;
 
-    private PlayerEntity playerEntity;
+    public PlayerEntity playerEntity;
     private MapCfg mapcfg;
     private Dictionary<string, MonsterEntity> monsterEntityDic = new Dictionary<string, MonsterEntity>();
 
-    public void Init(int mapid)
+    public bool triggerCheck = true;
+    public bool isPauseGame = false;
+    public void Init(int mapid,Action cb = null)
     {
         //初始化各管理器
         stateMgr = gameObject.AddComponent<StateMgr>();
@@ -28,7 +32,7 @@ public class BattleMgr : MonoBehaviour
         ResSvc.Instance.AsyncLoadScene(mapcfg.sceneName, () =>
         {
             //初始化地图数据
-            MapMgr mapMgr = GameObject.FindGameObjectWithTag("MapRoot").GetComponent<MapMgr>();
+            mapMgr = GameObject.FindGameObjectWithTag("MapRoot").GetComponent<MapMgr>();
             mapMgr.Init(this);
 
             mapMgr.transform.localPosition = Vector3.zero;
@@ -43,15 +47,52 @@ public class BattleMgr : MonoBehaviour
 
             AudioSvc.Instance.PlayBGAudio(Constants.BGHuangYe);
             BattleSys.Instance.SetPlayerCtrlWndState(true);
+
+            if (cb != null)
+            {
+                cb();
+            }
         });
         PECommon.Log("Init BattleMgr Done...");
 
     }
 
+    private void Update()
+    {
+        foreach (var item in monsterEntityDic)
+        {
+            MonsterEntity me = item.Value;
+            me.TickAILogic();
+        }
+
+        //检测当前批次的怪物是否被打死
+        if (mapMgr!=null)
+        {
+            if (triggerCheck&& monsterEntityDic.Count == 0)
+            {
+                bool isExist = mapMgr.SetNextTriggerOn();
+                triggerCheck = false;
+                if (!isExist)
+                {
+                    //战斗结束
+                    EndBattle(true, playerEntity.Hp);
+                    
+                }
+            }
+        }
+    }
+
+    public void EndBattle(bool isWin , int restHp)
+    {
+        isPauseGame = true;
+        AudioSvc.Instance.StopBGAudio();
+        BattleSys.Instance.EndBattle(isWin, restHp);
+
+    }
 
     private  void LoadPlayer(MapCfg mapcfg)
     {
-        GameObject player = ResSvc.Instance.LoadPrefab(PathDefine.AssassinBattle);
+        player = ResSvc.Instance.LoadPrefab(PathDefine.AssassinBattle);
         player.transform.position = mapcfg.playerBornPos;
         player.transform.localEulerAngles = mapcfg.playerBornRotate;
         player.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
@@ -111,7 +152,14 @@ public class BattleMgr : MonoBehaviour
                 monsterEntity.SetController (monsterController);
 
                 m.SetActive(false);
-                GameRoot.Instance.dynamicWnd.AddHpItemInfo(m.name,monsterController.hpRoot, monsterEntity.Hp);
+                if (monsterEntity.md.monsterCfg.monsterType == MonsterType.Normal)
+                {
+                    GameRoot.Instance.dynamicWnd.AddHpItemInfo(m.name, monsterController.hpRoot, monsterEntity.Hp);
+                }
+                else if (monsterEntity.md.monsterCfg.monsterType == MonsterType.Boss)
+                {
+                    BattleSys.Instance.playerCtrlWnd.SetBossHpState(true);
+                }
             }
         }
     }
@@ -150,16 +198,21 @@ public class BattleMgr : MonoBehaviour
             return;
         }
         //PECommon.Log(_dir.ToString());
-        if (_dir == Vector2.zero)
+        if (playerEntity.currentAniState == AniState.Idle || playerEntity.currentAniState == AniState.Move)
         {
-            playerEntity.Idle();
-            playerEntity.SetDir(Vector2.zero);
+            if (_dir == Vector2.zero)
+            {
+                playerEntity.Idle();
+                playerEntity.SetDir(Vector2.zero);
+            }
+            else
+            {
+                playerEntity.Move();
+                playerEntity.SetDir(_dir);
+            }
+
         }
-        else
-        {
-            playerEntity.Move();
-            playerEntity.SetDir(_dir);
-        }
+
     }
     public void ReqReleaseSkill(int index)
     {
@@ -179,10 +232,39 @@ public class BattleMgr : MonoBehaviour
                 break;
         }
     }
+
+    private int[] comboArr = new int[] { 111, 112, 113, 114, 115 };
+    public double lastAtkTime = 0;
+    public int comboIndex = 0;
     public void ReleaseNormalAtk()
     {
-        PECommon.Log("Click Normal Atk");
-        playerEntity.Attack(111);
+        //PECommon.Log("Click Normal Atk");
+        if (playerEntity.currentAniState == AniState.Attack)
+        {
+            //再500ms以内进行第二次点击
+            double nowAtkTime = TimeSvc.Instance.GetCurTime();
+            if (nowAtkTime - lastAtkTime< Constants.ComboMaxSpace && nowAtkTime - lastAtkTime > Constants.ComboMinSpace && lastAtkTime !=0)
+            {
+                if (comboArr[comboIndex]!= comboArr[comboArr.Length-1])
+                {
+                    comboIndex += 1;
+                    playerEntity.comboQue.Enqueue(comboArr[comboIndex]);
+                    lastAtkTime = nowAtkTime;
+                }
+                else
+                {
+                    lastAtkTime = 0;
+                    comboIndex = 0 ;
+                }
+
+            }
+        }
+        else if (playerEntity.currentAniState == AniState.Idle || playerEntity.currentAniState == AniState.Move)
+        {
+            comboIndex = 0;
+            lastAtkTime = TimeSvc.Instance.GetCurTime();
+            playerEntity.Attack(111);
+        }
 
     }
     public void ReleaseSkill1()
@@ -217,6 +299,11 @@ public class BattleMgr : MonoBehaviour
             monsterEntityDic.Remove(mname);
             GameRoot.Instance.dynamicWnd.DelHpItemInfo(mname);
         }
+    }
+
+    public bool CanRlsSkill()
+    {
+        return playerEntity.canRlsSkill;
     }
 }
 

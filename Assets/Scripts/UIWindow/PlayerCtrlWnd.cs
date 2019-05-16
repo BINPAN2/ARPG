@@ -22,22 +22,44 @@ public class PlayerCtrlWnd : WindowRoot {
 
     public Vector2 currentDir;
 
+    public Text txtPlayerHp;
+    public Image imgPlayerHpPrg;
+
+    public Transform bossHpTrans;
+    public Image imgHpRed;
+    public Image imgHpYellow;
+
+    private int MaxHp;
+
     protected override void InitWnd()
     {
         base.InitWnd();
         pointDis = Screen.height * 1.0f / Constants.ScreenStandardHeight * Constants.ScreenOPDis;
         defaultPos = imgDirBg.transform.position;
         SetActive(imgDirPoint, false);
-        RefreshUI();
+
         RegisterTouchEvts();
         skilll1CDTime = ResSvc.Instance.GetSkillCfg(101).cdTime/1000.0f;
         skilll2CDTime = ResSvc.Instance.GetSkillCfg(102).cdTime / 1000.0f;
         skilll3CDTime = ResSvc.Instance.GetSkillCfg(103).cdTime / 1000.0f;
 
+        MaxHp = GameRoot.Instance.PlayerData.hp;
+        SetText(txtPlayerHp, MaxHp + "/" + MaxHp);
+        imgPlayerHpPrg.fillAmount = 1;
+
+        SetBossHpState(false);
+
+        RefreshUI();
     }
 
     private void Update()
     {
+        //TEST
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            OnSkillBtnClick(0);
+        }
+
         if (isSkill1CD)
         {
             skill1FillCount += Time.deltaTime;
@@ -109,6 +131,8 @@ public class PlayerCtrlWnd : WindowRoot {
                 SetText(txtSKill3CD, skill3Num);
             }
         }
+
+        UpdateMixBlend();
     }
 
     public void RefreshUI()
@@ -185,13 +209,12 @@ public class PlayerCtrlWnd : WindowRoot {
             currentDir = dir.normalized;
             //TODO方向信息传递
             BattleSys.Instance.SetPlayerMoveDir(currentDir);
-            //Debug.Log(dir.normalized);
-
         });
 
     }
 
 
+    #region Skill
     public Image imgSkill1CD;
     public Text txtSKill1CD;
     private bool isSkill1CD = false;
@@ -215,6 +238,7 @@ public class PlayerCtrlWnd : WindowRoot {
     private int skill3Num;//显示的CD时间
     private float skill3FillCount = 0;//skill1的扇形图片计时器
     private float skill3NumCount = 0;//skill1的CD时间文本计时器
+    #endregion
 
     public void OnSkillBtnClick(int index)
     {
@@ -224,7 +248,7 @@ public class PlayerCtrlWnd : WindowRoot {
                 BattleSys.Instance.ReqReleaseSkill(index);
                 break;
             case 1:
-                if (isSkill1CD == false)
+                if (isSkill1CD == false&& GetCanRlsSkill())
                 {
                     BattleSys.Instance.ReqReleaseSkill(index);
                     isSkill1CD = true;
@@ -235,7 +259,7 @@ public class PlayerCtrlWnd : WindowRoot {
                 }
                 break;
             case 2:
-                if (isSkill2CD == false)
+                if (isSkill2CD == false && GetCanRlsSkill())
                 {
                     BattleSys.Instance.ReqReleaseSkill(index);
                     isSkill2CD = true;
@@ -246,7 +270,7 @@ public class PlayerCtrlWnd : WindowRoot {
                 }
                 break;
             case 3:
-                if (isSkill3CD == false)
+                if (isSkill3CD == false && GetCanRlsSkill())
                 {
                     BattleSys.Instance.ReqReleaseSkill(index);
                     isSkill3CD = true;
@@ -257,5 +281,52 @@ public class PlayerCtrlWnd : WindowRoot {
                 }
                 break;
         }
+    }
+
+    public void SetPlayerHpBarVal(int hp)
+    {
+        SetText(txtPlayerHp, hp + "/" + MaxHp);
+        imgPlayerHpPrg.fillAmount = hp * 1.0f / MaxHp;
+    }
+
+    public bool GetCanRlsSkill()
+    {
+        return BattleSys.Instance.battleMgr.CanRlsSkill();
+    }
+
+    public void SetBossHpState(bool state,float prgs=1.0f)
+    {
+        SetActive(bossHpTrans, state);
+        imgHpRed.fillAmount = prgs;
+        imgHpYellow.fillAmount = prgs;
+    }
+
+    private float currentHpPrg;
+    private float targetHpPrg;
+    public void SetBossHpVal(int oldVal,int newVal,int sumVal)
+    {
+        currentHpPrg = oldVal * 1.0f / sumVal;
+        targetHpPrg = newVal * 1.0f / sumVal;
+        imgHpRed.fillAmount = targetHpPrg;
+    }
+
+    private void UpdateMixBlend()
+    {
+        if (Mathf.Abs(currentHpPrg - targetHpPrg) < Constants.AccelerHpSpeed * Time.deltaTime)
+        {
+            currentHpPrg = targetHpPrg;
+        }
+        else if (currentHpPrg > targetHpPrg)
+        {
+            currentHpPrg -= Constants.AccelerHpSpeed * Time.deltaTime;
+        }
+
+        imgHpYellow.fillAmount = currentHpPrg;
+    }
+
+    public void OnHeadBtnClick()
+    {
+        AudioSvc.Instance.PlayUIAudio(Constants.UIClickBtn);
+        BattleSys.Instance.SetBattleEndWndState(BattleEndType.Pause, true);
     }
 }

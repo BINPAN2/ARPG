@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
 /// 逻辑实体基类
@@ -10,7 +11,11 @@ public abstract class EntityBase{
     public StateMgr stateMgr = null;
     public SkillMgr skillMgr = null;
 
+    public EntityType entityType = EntityType.None;
+    public EntityState entityState = EntityState.None;
+
     public bool canMove = true;
+    public bool canRlsSkill = true;
 
     protected Controller controller = null;
 
@@ -60,6 +65,16 @@ public abstract class EntityBase{
         }
     }
     private int hp;
+    public Queue<int> comboQue = new Queue<int>();
+    public int nextSkillID = 0;
+    public SkillCfg curSkillCfg;
+
+    //技能位移回调ID（TimeTask）
+    public List<int> skillMoveCBLst = new List<int>();
+    //技能伤害回调ID（TimeTask）
+    public List<int> skillActionCBLst = new List<int>();
+
+    public int skillEndCB = -1;
 
     public virtual void SetBattleProps(BattleProps props)
     {
@@ -82,7 +97,6 @@ public abstract class EntityBase{
         stateMgr.ChangeState(this, AniState.Hit);
     }
 
-
     public void Idle()
     {
         stateMgr.ChangeState(this, AniState.Idle);
@@ -96,6 +110,13 @@ public abstract class EntityBase{
     public void Attack(int skillID)
     {
         stateMgr.ChangeState(this, AniState.Attack,skillID);
+    }
+
+    public virtual void TickAILogic() { }
+
+    public virtual Vector2 CalcTargetDir()
+    {
+        return Vector2.zero;
     }
 
     public virtual void SetBlend(float blend)
@@ -124,6 +145,8 @@ public abstract class EntityBase{
 
     public  void SkillAttack(int skillID)
     {
+        skillActionCBLst.Clear();
+        skillMoveCBLst.Clear();
         AttackEffect(skillID);
         AttackDamage(skillID);
     }
@@ -158,6 +181,21 @@ public abstract class EntityBase{
     {
         return Vector2.zero;
     }
+    
+    public virtual void SetAtkDir(Vector2 dir,bool offset = false)
+    {
+        if (controller != null)
+        {
+            if (offset)
+            {
+                controller.SetAtkDirCam(dir);
+            }
+            else
+            {
+                controller.SetAtkDirLocal(dir);
+            }
+        }
+    }
 
     public Vector3 GetPos()
     {
@@ -169,7 +207,7 @@ public abstract class EntityBase{
         return controller.transform;
     }
 
-    public void SetDodge()
+    public virtual void SetDodge()
     {
         if (controller !=null)
         {
@@ -193,7 +231,7 @@ public abstract class EntityBase{
         }
     }
 
-    public void SetHpVal(int oldVal,int newVal)
+    public virtual void SetHpVal(int oldVal,int newVal)
     {
         if (controller != null)
         {
@@ -219,6 +257,111 @@ public abstract class EntityBase{
         if (controller !=null)
         {
             controller.gameObject.SetActive(isActive);
+        }
+    }
+
+    public void ExitCurSkill()
+    {
+        if (curSkillCfg !=null)
+        {
+            if (curSkillCfg.isCombo)
+            {
+                if (comboQue.Count > 0)
+                {
+                    nextSkillID = comboQue.Dequeue();
+                }
+                else
+                {
+                    nextSkillID = 0;
+                }
+            }
+
+            if (entityState == EntityState.BatiState)
+            {
+                entityState = EntityState.None;
+            }
+
+            curSkillCfg = null;
+        }
+
+
+
+        SetAction(Constants.DefaultAction);
+        canMove = true;
+    }
+
+    public AudioSource GetAudioSource()
+    {
+        return controller.GetComponent<AudioSource>();
+    }
+
+    public void RemoveMoveCB(int tid)
+    {
+        int index = -1;
+        for (int i = 0; i < skillMoveCBLst.Count; i++)
+        {
+            if (skillMoveCBLst[i] == tid)
+            {
+                index = i;
+                break;
+            }
+        }
+        if (index != -1)
+        {
+            skillMoveCBLst.RemoveAt(index);
+        }
+    }
+
+    public void RemoveActionCB(int tid)
+    {
+        int index = -1;
+        for (int i = 0; i < skillActionCBLst.Count; i++)
+        {
+            if (skillActionCBLst[i] == tid)
+            {
+                index = i;
+                break;
+            }
+        }
+        if (index != -1)
+        {
+            skillActionCBLst.RemoveAt(index);
+        }
+    }
+
+    public virtual bool GetBreakState()
+    {
+        return true;
+    }
+
+    public void RemoveSkillCB()
+    {
+        for (int i = 0; i < skillMoveCBLst.Count; i++)
+        {
+            int tid = skillMoveCBLst[i];
+            TimeSvc.Instance.DelTask(tid);
+        }
+
+        for (int i = 0; i < skillActionCBLst.Count; i++)
+        {
+            int tid = skillActionCBLst[i];
+            TimeSvc.Instance.DelTask(tid);
+        }
+
+        if (skillEndCB != -1)
+        {
+            TimeSvc.Instance.DelTask(skillEndCB);
+            skillEndCB = -1;
+        }
+
+
+        //清空连招队列
+        if (nextSkillID != 0 || comboQue.Count > 0)
+        {
+            nextSkillID = 0;
+            comboQue.Clear();
+            battleMgr.lastAtkTime = 0;
+            battleMgr.comboIndex = 0;
         }
     }
 }

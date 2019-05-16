@@ -33,7 +33,11 @@ public class MonsterData : BaseData<MonsterData>
 public class MonsterCfg : BaseData<MonsterCfg>
 {
     public string mName;
+    public MonsterType monsterType;//1:普通怪物 2:Boos
+    public bool isStop;//是否能被攻击打断当前状态
     public string resPath;
+    public int skillID;
+    public float atkDis;
     public BattleProps battleProps;
 }
 
@@ -48,6 +52,9 @@ public class MapCfg : BaseData<MapCfg>
     public Vector3 playerBornPos;
     public Vector3 playerBornRotate;
     public List<MonsterData> monsterLst;
+    public int exp;
+    public int coin;
+    public int crystal;
 }
 
 
@@ -81,6 +88,9 @@ public class SkillCfg : BaseData<SkillCfg>
     public int cdTime;
     public int aniAction;
     public string fx;
+    public bool isCombo;
+    public bool isCollide;
+    public bool isBreak;
     public DamageType damageType;
     public List<int> skillMoveLst;
     public List<int> skillActionLst;

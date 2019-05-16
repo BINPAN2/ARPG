@@ -4,7 +4,8 @@ using UnityEngine;
 /// <summary>
 /// 音效服务
 /// </summary>
-public class AudioSvc : MonoBehaviour {
+public class AudioSvc : MonoBehaviour
+{
     private static AudioSvc instance = null;
     private AudioSvc() { }
 
@@ -29,10 +30,10 @@ public class AudioSvc : MonoBehaviour {
         Debug.Log("Init AudioSvc...");
     }
 
-    public void PlayBGAudio(string name,bool isloop = true)
+    public void PlayBGAudio(string name, bool isloop = true)
     {
-        AudioClip clip = ResSvc.Instance.LoadAudio("ResAudio/" + name,true);
-        if (BGAudio.clip==null||BGAudio.clip.name!=clip.name)
+        AudioClip clip = ResSvc.Instance.LoadAudio("ResAudio/" + name, true);
+        if (BGAudio.clip == null || BGAudio.clip.name != clip.name)
         {
             BGAudio.clip = clip;
             BGAudio.loop = isloop;
@@ -45,5 +46,21 @@ public class AudioSvc : MonoBehaviour {
         AudioClip clip = ResSvc.Instance.LoadAudio("ResAudio/" + name, true);
         UIAudio.clip = clip;
         UIAudio.Play();
+    }
+
+    public void PlayPlayerAudio(string name, AudioSource source)
+    {
+        AudioClip clip = ResSvc.Instance.LoadAudio("ResAudio/" + name, true);
+        source.clip = clip;
+        source.Play();
+    }
+
+    public void StopBGAudio()
+    {
+        if (BGAudio != null)
+        {
+            BGAudio.Stop();
+
+        }
     }
 }

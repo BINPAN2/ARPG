@@ -194,7 +194,6 @@ public class ResSvc : MonoBehaviour {
     #region MapCfgs
     private Dictionary<int, MapCfg> mapCfgDataDic = new Dictionary<int, MapCfg>();
 
-
     public void InitMapCfg(string path)
     {
         TextAsset xml = Resources.Load<TextAsset>(path);
@@ -290,6 +289,15 @@ public class ResSvc : MonoBehaviour {
                                 }
                             }
                             break;
+                        case "exp":
+                            mapCfg.exp = int.Parse(item.InnerText);
+                            break;
+                        case "coin":
+                            mapCfg.coin = int.Parse(item.InnerText);
+                            break;
+                        case "crystal":
+                            mapCfg.crystal = int.Parse(item.InnerText);
+                            break;
                     }
                 }
                 mapCfgDataDic.Add(ID, mapCfg);
@@ -310,7 +318,6 @@ public class ResSvc : MonoBehaviour {
 
     #region MonsterCfgs
     private Dictionary<int, MonsterCfg> monsterCfgDic = new Dictionary<int, MonsterCfg>();
-
 
     public void InitMonsterCfg(string path)
     {
@@ -345,8 +352,27 @@ public class ResSvc : MonoBehaviour {
                         case "mName":
                             monsterCfg.mName = item.InnerText;
                             break;
+                        case "mType":
+                            if (item.InnerText == "1")
+                            {
+                                monsterCfg.monsterType = MonsterType.Normal;
+                            }
+                            else if (item.InnerText == "2")
+                            {
+                                monsterCfg.monsterType = MonsterType.Boss;
+                            }
+                            break;
+                        case "isStop":
+                            monsterCfg.isStop = item.InnerText.Equals("1");
+                            break;
                         case "resPath":
                             monsterCfg.resPath = item.InnerText;
+                            break;
+                        case "skillID":
+                            monsterCfg.skillID = int.Parse(item.InnerText);
+                            break;
+                        case "atkDis":
+                            monsterCfg.atkDis = float.Parse(item.InnerText);
                             break;
                         case "hp":
                             monsterCfg.battleProps.hp = int.Parse(item.InnerText);
@@ -695,6 +721,15 @@ public class ResSvc : MonoBehaviour {
                             break;
                         case "fx":
                             skillCfg.fx = item.InnerText;
+                            break;
+                        case "isCombo":
+                            skillCfg.isCombo = item.InnerText.Equals("1");
+                            break;
+                        case "isCollide":
+                            skillCfg.isCollide = item.InnerText.Equals("1");
+                            break;
+                        case "isBreak":
+                            skillCfg.isBreak = item.InnerText.Equals("1");
                             break;
                         case "dmgType":
                             if (item.InnerText.Equals("1"))

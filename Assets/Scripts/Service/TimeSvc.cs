@@ -44,4 +44,14 @@ public class TimeSvc : MonoBehaviour
         return pt.AddTimeTask(callback, delay, timeUnit, count);
     }
 
+    public double GetCurTime()
+    {
+        return pt.GetMillisecondsTime();
+    }
+
+    public void DelTask(int tid)
+    {
+        pt.DeleteTimeTask(tid);
+    }
+
 }

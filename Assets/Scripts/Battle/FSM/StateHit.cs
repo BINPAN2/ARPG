@@ -7,14 +7,26 @@ public class StateHit : IState
     public void Enter(EntityBase entity, params object[] args)
     {
         entity.currentAniState = AniState.Hit;
+
+        entity.SetSkillMoveState(false);
+        entity.SetDir(Vector2.zero);
+
+        entity.RemoveSkillCB();
     }
 
     public void Exit(EntityBase entity, params object[] args)
     {
+
     }
 
     public void Process(EntityBase entity, params object[] args)
     {
+        if (entity.entityType == EntityType.Player)
+        {
+            entity.canRlsSkill = false;
+            AudioSource playerAudio = entity.GetAudioSource();
+            AudioSvc.Instance.PlayPlayerAudio(Constants.AssassinHit, playerAudio);
+        }
         entity.SetDir(Vector2.zero);
         entity.SetAction(Constants.ActionHit);
         TimeSvc.Instance.AddTimeTask((int tid) =>

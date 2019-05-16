@@ -21,6 +21,26 @@ public enum DamageType
     Ap=2,
 }
 
+public enum EntityType
+{
+    None,
+    Player,
+    Monster,
+}
+
+public enum EntityState
+{
+    None,
+    BatiState,
+}
+
+public enum MonsterType
+{
+    None,
+    Normal =1 ,
+    Boss = 2,
+}
+
 public class Constants {
     //字符颜色
     private const string ColorRed = "<color=#FF0000FF>";
@@ -59,6 +79,7 @@ public class Constants {
     public const string BGLogin = "bgLogin";
     public const string BGMainCity = "bgMainCity";
     public const string BGHuangYe = "bgHuangYe";
+    public const string AssassinHit = "assassin_Hit";
 
     //登录按钮音效
     public const string UILoginBtn = "uiLoginBtn";
@@ -68,6 +89,10 @@ public class Constants {
     public const string UIClickBtn = "uiClickBtn";
     public const string UIExtenBtn = "uiExtenBtn";
     public const string FBItem = "fbitem";
+
+    public const string FBWin = "fbwin";
+    public const string FBLose = "fblose";
+
 
     //默认屏幕分辨率
     public const int ScreenStandardHeight = 1080;
@@ -103,4 +128,8 @@ public class Constants {
     public const int NPCArtisan = 2;
     public const int NPCTrader = 3;
     public const int NPCNone = -1;
+
+    //普通攻击连招有效间隔
+    public const int ComboMaxSpace = 700;
+    public const int ComboMinSpace = 400;
 }

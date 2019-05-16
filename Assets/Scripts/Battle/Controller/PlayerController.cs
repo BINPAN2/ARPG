@@ -16,7 +16,7 @@ public class PlayerController : Controller
     public GameObject daggeratk4fx;
     public GameObject daggeratk5fx;
 
-    private Transform CamTrans;
+
     private Vector3 camOffset;
 
 
@@ -81,7 +81,7 @@ public class PlayerController : Controller
 
         if (curBlend!=targetBlend)
         {
-        UpdateMixBlend();
+            UpdateMixBlend();
 
         }
         if (isMove)

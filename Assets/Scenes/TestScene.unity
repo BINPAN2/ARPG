@@ -313,11 +313,6 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 143081825}
   m_CullTransparentMesh: 0
---- !u!1 &237293792 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1901019358016306, guid: bb97dfbc76c0cbd43a9e76f4dcc64f72,
-    type: 2}
-  m_PrefabInternal: {fileID: 1112288034}
 --- !u!1 &301327565
 GameObject:
   m_ObjectHideFlags: 0
@@ -673,47 +668,15 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 114915722485573864, guid: bb97dfbc76c0cbd43a9e76f4dcc64f72,
-        type: 2}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1901019358016306, guid: bb97dfbc76c0cbd43a9e76f4dcc64f72, type: 2}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bb97dfbc76c0cbd43a9e76f4dcc64f72, type: 2}
   m_IsPrefabAsset: 0
---- !u!1 &1112288035 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 199576, guid: bb97dfbc76c0cbd43a9e76f4dcc64f72,
-    type: 2}
-  m_PrefabInternal: {fileID: 1112288034}
---- !u!143 &1112288036 stripped
-CharacterController:
-  m_CorrespondingSourceObject: {fileID: 143580826048598874, guid: bb97dfbc76c0cbd43a9e76f4dcc64f72,
-    type: 2}
-  m_PrefabInternal: {fileID: 1112288034}
---- !u!95 &1112288037 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 9599464, guid: bb97dfbc76c0cbd43a9e76f4dcc64f72,
-    type: 2}
-  m_PrefabInternal: {fileID: 1112288034}
---- !u!114 &1112288038
+--- !u!114 &1112288038 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1112288035}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 114691643856854794, guid: bb97dfbc76c0cbd43a9e76f4dcc64f72,
+    type: 2}
+  m_PrefabInternal: {fileID: 1112288034}
   m_Script: {fileID: 11500000, guid: 8a9fdc417174d084bbc80af2396603f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  anim: {fileID: 1112288037}
-  ctrl: {fileID: 1112288036}
-  daggerSkill1fx: {fileID: 237293792}
 --- !u!1001 &2006353421
 Prefab:
   m_ObjectHideFlags: 0

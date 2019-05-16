@@ -981,7 +981,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5e6aeb59564d6d4c9d1139c996b7841, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ctrl: {fileID: 0}
+  ctrl: {fileID: 143523188235059154}
   anim: {fileID: 9500000}
   hpRoot: {fileID: 400052}
 --- !u!143 &143523188235059154

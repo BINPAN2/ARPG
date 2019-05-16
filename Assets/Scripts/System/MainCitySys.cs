@@ -58,6 +58,7 @@ public class MainCitySys :MonoBehaviour {
             mainCityWnd.SetWndState(true);
             //播放主城背景音乐
             AudioSvc.Instance.PlayBGAudio(Constants.BGMainCity);
+            //GameRoot.Instance.GetComponent<AudioListener>().enabled = false;
 
             GameObject map = GameObject.FindGameObjectWithTag("MapRoot");
             MainCityMap mainCityMap = map.GetComponent<MainCityMap>();
